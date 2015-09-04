@@ -75,4 +75,33 @@ class MethodClass{
 		num = i;
 		fac *= i;
 	}
+	
+	public void reverseString() {
+		String newStr;
+		SAVE(newStr);
+		newStr = "";
+		{
+			int i;
+			Object length_var;
+			SAVE(length_var);
+			length_var = str.length();
+			SAVE(i);
+			i = length_var - 1;
+			while_loop: {
+				Integer while_counter_1;
+				while_counter_1 = 0;
+				while (i >= 0) {
+					while_counter_1++;
+					newStr += str.getCharAt(i);
+					i--;
+				}
+				SAVE(while_counter_1);
+			}
+			SAVE(length_var);
+			SAVE(i);
+		}
+		SAVE(str);
+		str = newStr;
+		SAVE(newStr);
+	}
 }

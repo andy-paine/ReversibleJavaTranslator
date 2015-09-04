@@ -62,8 +62,8 @@ public class ReversedFirstPass extends CustomVisitor {
 
     public ASTNode getReverse(ExpressionStatement node) {
         ExpressionStatement ret = ((ExpressionStatement) ASTNode.copySubtree(node.getAST(), node));
-
         try {
+            /* uses reflection to get the reverse of the node's expression*/
             Expression expression = node.getExpression();
             Method getReverse = ReversedFirstPass.class.getMethod("getReverse", expression.getClass());
             ASTNode rev = (ASTNode)getReverse.invoke(this, expression);
@@ -81,19 +81,22 @@ public class ReversedFirstPass extends CustomVisitor {
     public ASTNode getReverse(LabeledStatement node) {
         LabeledStatement ret = (LabeledStatement)ASTNode.copySubtree(node.getAST(), node);
         if (node.getLabel().getFullyQualifiedName().equals("while_loop")) {
+            /* if this is a l;oop containing a while statement */
             Block body = (Block)node.getBody();
             Block newBody = node.getAST().newBlock();
-            //add the variable declaration
+            /* add the counter declaration */
             newBody.statements().add(ASTNode.copySubtree(node.getAST(), (ASTNode) body.statements().get(0)));
-            //get the name out of it
+            /* save the name of the counter variable */
             SimpleName name = ((VariableDeclarationFragment) ((VariableDeclarationStatement) body.statements().get(0)).fragments().get(0)).getName();
 
+            /* SAVE the counter variable */
             MethodInvocation methodInvoc = node.getAST().newMethodInvocation();
             methodInvoc.arguments().add(ASTNode.copySubtree(node.getAST(), name));
             methodInvoc.setName(node.getAST().newSimpleName("SAVE"));
             ExpressionStatement methodInvocExpression = node.getAST().newExpressionStatement(methodInvoc);
             newBody.statements().add(methodInvocExpression);
 
+            /* change the while statement condition to be counter variable > 0 */
             InfixExpression infixExpression = node.getAST().newInfixExpression();
             infixExpression.setLeftOperand((Expression) ASTNode.copySubtree(node.getAST(), name));
             infixExpression.setOperator(InfixExpression.Operator.GREATER);
@@ -106,35 +109,14 @@ public class ReversedFirstPass extends CustomVisitor {
             newBody.statements().add(ASTNode.copySubtree(node.getAST(), whileStatement));
 
             ret.setBody(newBody);
-        } /*else if (node.getLabel().getFullyQualifiedName().equals("if_statement")) {
-            Block body = (Block)node.getBody();
-            Block newBody = node.getAST().newBlock();
-
-            newBody.statements().add(ASTNode.copySubtree(node.getAST(), (ASTNode) body.statements().get(0)));
-            //get the name out of it
-            SimpleName name = ((VariableDeclarationFragment) ((VariableDeclarationStatement) body.statements().get(0)).fragments().get(0)).getName();
-
-            MethodInvocation methodInvoc = node.getAST().newMethodInvocation();
-            methodInvoc.arguments().add(ASTNode.copySubtree(node.getAST(), name));
-            methodInvoc.setName(node.getAST().newSimpleName("SAVE"));
-            ExpressionStatement methodInvocExpression = node.getAST().newExpressionStatement(methodInvoc);
-            newBody.statements().add(methodInvocExpression);
-
-            IfStatement ifStatement = (IfStatement)body.statements().get(2);
-            ifStatement.setThenStatement((Block) getReverse((Block) ifStatement.getThenStatement()));
-            if (ifStatement.getElseStatement() != null) {
-                ifStatement.setElseStatement((Block)getReverse((Block)ifStatement.getElseStatement()));
-            }
-
-            newBody.statements().add(ASTNode.copySubtree(node.getAST(), ifStatement));
-
-            ret.setBody(newBody);
-        }*/ else if (node.getBody() instanceof Block)
+        } else if (node.getBody() instanceof Block)
+            /* otherwise, just get the reverse of the body */
             ret.setBody((Block) getReverse((Block) node.getBody()));
         return ret;
     }
 
     public ASTNode getReverse(IfStatement node) {
+        /* get the reverse of the then and else statement (if else is not null) */
         IfStatement ret = (IfStatement)ASTNode.copySubtree(node.getAST(), node);
         ret.setThenStatement((Statement) getReverse((Block) node.getThenStatement()));
         if (node.getElseStatement() != null)
@@ -148,15 +130,20 @@ public class ReversedFirstPass extends CustomVisitor {
 
     public ASTNode getReverse(Assignment node) {
         if (!(node.getOperator() == Assignment.Operator.ASSIGN)) {
+            /* if the assignment uses an operator other than = */
             if (node.getRightHandSide() instanceof MethodInvocation) {
+                /* if the assignment RHS is a method invocation, return it's reverse
+                * this is due to reverse methods always being void */
                 return getReverse(((MethodInvocation) node.getRightHandSide()));
             } else {
+                /* otherwise return */
                 Assignment ret = (Assignment)ASTNode.copySubtree(node.getAST(), node);
                 ret.setOperator(getReverse(node.getOperator()));
                 return ret;
             }
         } else {
             if (node.getRightHandSide() instanceof MethodInvocation) {
+                /* return the node's right hand side */
                 return ASTNode.copySubtree(node.getAST(), node.getRightHandSide());
             }
             return ASTNode.copySubtree(node.getAST(), node);
@@ -168,6 +155,7 @@ public class ReversedFirstPass extends CustomVisitor {
         MethodInvocation ret = (MethodInvocation)ASTNode.copySubtree(node.getAST(), node);
 
         if (!node.getName().getFullyQualifiedName().equals("SAVE")) {
+            /* return the same method with the prefix "rev_" */
             SimpleName name = node.getAST().newSimpleName("rev_" + node.getName().getFullyQualifiedName());
             ret.setName(name);
         }
@@ -181,6 +169,7 @@ public class ReversedFirstPass extends CustomVisitor {
         return  ret;
     }
 
+    /* Returns the reverse of each prefix operator */
     public PrefixExpression.Operator getReverse(PostfixExpression.Operator op) {
         if (op == PostfixExpression.Operator.DECREMENT)
             return PrefixExpression.Operator.INCREMENT;
@@ -197,6 +186,7 @@ public class ReversedFirstPass extends CustomVisitor {
         return  ret;
     }
 
+    /* Returns the reverse of each postfix operator */
     public PostfixExpression.Operator getReverse(PrefixExpression.Operator op) {
         if (op == PrefixExpression.Operator.DECREMENT)
             return PostfixExpression.Operator.INCREMENT;
@@ -206,6 +196,7 @@ public class ReversedFirstPass extends CustomVisitor {
             return null;
     }
 
+    /* Returns the reverse of each assignment operator */
     public Assignment.Operator getReverse(Assignment.Operator op) {
         if (op == Assignment.Operator.PLUS_ASSIGN)
             return Assignment.Operator.MINUS_ASSIGN;

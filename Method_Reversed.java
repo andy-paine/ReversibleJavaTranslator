@@ -59,4 +59,29 @@ class MethodClass{
 		fac /= i;
 		num = RESTORE();
 	}
+	
+	public void rev_reverseString() {
+		String newStr;
+		newStr = RESTORE();
+		str = RESTORE();
+		{
+			int i;
+			Object length_var;
+			i = RESTORE();
+			length_var = RESTORE();
+			while_loop: {
+				Integer while_counter_1;
+				while_counter_1 = RESTORE();
+				while (while_counter_1 > 0) {
+					++i;
+					str.rev_getCharAt(i);
+					--while_counter_1;
+				}
+			}
+			i = RESTORE();
+			str.length();
+			length_var = RESTORE();
+		}
+		newStr = RESTORE();
+	}
 }

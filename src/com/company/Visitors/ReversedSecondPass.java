@@ -32,11 +32,13 @@ public class ReversedSecondPass extends CustomVisitor {
             StatementBreakPointPair pair = (StatementBreakPointPair)it.next();
             Statement stmt = pair.statement;
 
+            /* for every statement in the list, if it is not a break or "out_of_scope" statement*/
             if (!(stmt instanceof BreakStatement) && !(stmt instanceof ExpressionStatement && ((ExpressionStatement) stmt).getExpression() instanceof Assignment)
                     && !(stmt instanceof LabeledStatement && ((LabeledStatement) stmt).getLabel().getFullyQualifiedName().equals("out_of_scope"))) {
                 IfStatement ifStatement = declaration.getAST().newIfStatement();
                 List<InfixExpression> infixExpressions = new ArrayList<InfixExpression>();
 
+                /* create an infix expression for each "broke_here" value */
                 for (int i=0; i<pair.breakPoints.size(); i++) {
                     InfixExpression infixExpression = declaration.getAST().newInfixExpression();
                     infixExpression.setLeftOperand(declaration.getAST().newSimpleName("broke_here"));
@@ -45,6 +47,7 @@ public class ReversedSecondPass extends CustomVisitor {
                     infixExpressions.add(infixExpression);
                 }
 
+                /* chain together all infix expressions into a single expression */
                 InfixExpression mainExpression = infixExpressions.get(0);
                 for (int i=1; i<infixExpressions.size(); i++) {
                     InfixExpression subExpression = declaration.getAST().newInfixExpression();
@@ -54,11 +57,14 @@ public class ReversedSecondPass extends CustomVisitor {
                     mainExpression = subExpression;
                 }
 
+                /* create a new if statement around the statement */
+                /* set the condition to be the infix expression calculataed */
                 ifStatement.setExpression((Expression)ASTNode.copySubtree(declaration.getAST(), mainExpression));
                 Block ifBody = declaration.getAST().newBlock();
                 ifBody.statements().add(ASTNode.copySubtree(declaration.getAST(), stmt));
                 ifStatement.setThenStatement(ifBody);
 
+                /* replace the statement with the new containing if statement */
                 ASTNode parent = TranslationUtil.getContainingBlock(stmt);
                 ListRewrite listRewrite = rewriter.getListRewrite(parent.getParent(), Block.STATEMENTS_PROPERTY);
                 listRewrite.replace(stmt, ifStatement, null);
@@ -85,13 +91,15 @@ public class ReversedSecondPass extends CustomVisitor {
         /* keep going until the block to break has been reached */
         while (!(parent instanceof LabeledStatement) || !(((LabeledStatement) parent).getLabel().getFullyQualifiedName().equals("return_label"))) {
             if (!(parent instanceof WhileStatement) && !(parent instanceof IfStatement)) {
-                //if we aren't in a while loop block, scan through the statements
+                /* if a while loop block has not been reached, scan through the statements*/
                 boolean reached = false;
                 Block block = (Block)parent.getParent();
                 Iterator it = block.statements().iterator();
+                /* while we have not reached the containing block for this break */
                 while (it.hasNext() && !reached) {
                     Statement stmt = (Statement)it.next();
                     if (stmt.equals(parent))
+                        /* if we have reached the containing block for this break */
                         reached = true;
                     else {
                     /* if we haven't reached that statement yet, add this to the list */
@@ -107,6 +115,7 @@ public class ReversedSecondPass extends CustomVisitor {
             parent = TranslationUtil.getContainingBlock(parent.getParent());
 
         }
+        /* delete the break statement */
         ASTNode container = TranslationUtil.getContainingBlock(breakStatement);
         ListRewrite listRewrite = rewriter.getListRewrite(container.getParent(), Block.STATEMENTS_PROPERTY);
         listRewrite.remove(breakStatement, null);
@@ -116,6 +125,7 @@ public class ReversedSecondPass extends CustomVisitor {
 
     @Override
     public boolean visit(LabeledStatement labeledStatement) {
+        /* remove any labels marked as "break_save" */
         if (labeledStatement.getLabel().getFullyQualifiedName().equals("break_save")) {
             ASTNode container = TranslationUtil.getContainingBlock(labeledStatement);
             ListRewrite listRewrite = rewriter.getListRewrite(container.getParent(), Block.STATEMENTS_PROPERTY);

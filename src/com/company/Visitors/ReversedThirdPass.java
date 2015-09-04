@@ -13,6 +13,7 @@ public class ReversedThirdPass extends CustomVisitor {
 
     @Override
     public boolean visit(VariableDeclarationStatement statement) {
+        /* move all variable declarations to the top of their scope */
         ASTNode block = TranslationUtil.getContainingBlock(statement);
         ListRewrite listRewrite = rewriter.getListRewrite(block.getParent(), Block.STATEMENTS_PROPERTY);
 
@@ -24,6 +25,7 @@ public class ReversedThirdPass extends CustomVisitor {
 
     @Override
     public boolean visit(ExpressionStatement expressionStatement) {
+        /* replace all SAVE(x) expressions with x = RESTORE() */
         if (expressionStatement.getLocationInParent() == LabeledStatement.BODY_PROPERTY && ((LabeledStatement) expressionStatement.getParent()).getLabel().getFullyQualifiedName().equals("out_of_scope")) {
             MethodInvocation saveInvoc = (MethodInvocation)expressionStatement.getExpression();
 

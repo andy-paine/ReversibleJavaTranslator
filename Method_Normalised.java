@@ -42,4 +42,20 @@ class MethodClass{
 		num = i;
 		fac *= i;
 	}
+	
+	public void reverseString() {
+		String newStr;
+		newStr = "";
+		{
+			Object length_var;
+			length_var = str.length();
+			int i;
+			i = length_var - 1;
+			while (i >= 0) {
+				newStr += str.getCharAt(i);
+				i--;
+			}
+		}
+		str = newStr;
+	}
 }
