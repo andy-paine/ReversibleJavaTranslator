@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="org.eclipse.core.runtime-3.7.0">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Downloads/org.eclipse.core.runtime-3.7.0.jar" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$USER_HOME$/Downloads/org.eclipse.core.runtime-3.7.0.jar" recursive="false" />
+  </library>
+</component>

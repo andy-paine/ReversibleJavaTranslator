@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="org.eclipse.core.resources">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Downloads/org.eclipse.core.resources.jar" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$USER_HOME$/Downloads/org.eclipse.core.resources.jar" recursive="false" />
+  </library>
+</component>

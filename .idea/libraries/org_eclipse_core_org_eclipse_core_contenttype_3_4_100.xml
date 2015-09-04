@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="org.eclipse.core:org.eclipse.core.contenttype:3.4.100" type="repository">
+    <properties maven-id="org.eclipse.core:org.eclipse.core.contenttype:3.4.100" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse.core.contenttype-3.4.100.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse.equinox.preferences-3.4.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse.equinox.common-3.6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse.equinox.registry-3.5.101.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse.core.contenttype-3.4.100-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse.core.contenttype-3.4.100-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

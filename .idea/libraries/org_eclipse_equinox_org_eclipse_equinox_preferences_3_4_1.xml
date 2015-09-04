@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="org.eclipse.equinox:org.eclipse.equinox.preferences:3.4.1" type="repository">
+    <properties maven-id="org.eclipse.equinox:org.eclipse.equinox.preferences:3.4.1" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse.equinox.preferences-3.4.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse.equinox.common-3.6.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse.equinox.preferences-3.4.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse.equinox.preferences-3.4.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
